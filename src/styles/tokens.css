@@ -1,0 +1,114 @@
+/* Car Wash OS — console design tokens.
+   Navy + amber operations dashboard. Light is the bare :root; dark overrides values.
+   Token NAMES are unchanged so existing Tailwind utilities re-skin automatically. */
+:root {
+  --ground: #f5f7fb;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --ink: #0c3064;
+  --ink-soft: #334b73;
+  --ink-faint: #5a6980;
+  --line: #e6ecf5;
+  --line-soft: #edf2f9;
+
+  /* primary = deep navy */
+  --accent: #0c3064;
+  --accent-deep: #09244d;
+  --accent-wash: rgba(12, 48, 100, 0.08);
+
+  /* secondary = amber (exposed as --warn tokens, also --secondary) */
+  --secondary: #f59e0b;
+  --secondary-wash: rgba(245, 158, 11, 0.14);
+  /* amber is a fill colour; small text on a light ground needs this darker one */
+  --secondary-ink: #996008;
+
+  --good: #08704e;
+  --good-wash: rgba(16, 185, 129, 0.12);
+  --warn: #b8740a;
+  --warn-wash: rgba(245, 158, 11, 0.16);
+  --crit: #c8253a;
+  --crit-wash: rgba(226, 61, 78, 0.12);
+
+  --shadow: 0 1px 3px rgba(15, 35, 74, 0.06), 0 10px 32px rgba(15, 35, 74, 0.06);
+  --font-sans: 'Tajawal', 'IBM Plex Sans Arabic', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'IBM Plex Mono', monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --ground: #0b1120;
+    --surface: #111827;
+    --surface-2: #182235;
+    --ink: #edeef2;
+    --ink-soft: #9aa4bd;
+    --ink-faint: #8c99b5;
+    --line: rgba(255, 255, 255, 0.09);
+    --line-soft: rgba(255, 255, 255, 0.06);
+    --accent: #f59e0b;
+    --accent-deep: #fbbf24;
+    --accent-wash: rgba(245, 158, 11, 0.14);
+    --secondary: #f59e0b;
+    --secondary-wash: rgba(245, 158, 11, 0.16);
+    --secondary-ink: #f59e0b;
+    --good: #0db67a;
+    --good-wash: rgba(13, 182, 122, 0.14);
+    --warn: #f59e0b;
+    --warn-wash: rgba(245, 158, 11, 0.16);
+    --crit: #ff6b7e;
+    --crit-wash: rgba(240, 78, 101, 0.14);
+    --shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 2px 16px rgba(0, 0, 0, 0.35);
+  }
+}
+
+:root[data-theme='dark'] {
+  --ground: #0b1120;
+  --surface: #111827;
+  --surface-2: #182235;
+  --ink: #edeef2;
+  --ink-soft: #9aa4bd;
+  --ink-faint: #8c99b5;
+  --line: rgba(255, 255, 255, 0.09);
+  --line-soft: rgba(255, 255, 255, 0.06);
+  --accent: #f59e0b;
+  --accent-deep: #fbbf24;
+  --accent-wash: rgba(245, 158, 11, 0.14);
+  --secondary: #f59e0b;
+  --secondary-wash: rgba(245, 158, 11, 0.16);
+  --secondary-ink: #f59e0b;
+  --good: #0db67a;
+  --good-wash: rgba(13, 182, 122, 0.14);
+  --warn: #f59e0b;
+  --warn-wash: rgba(245, 158, 11, 0.16);
+  --crit: #ff6b7e;
+  --crit-wash: rgba(240, 78, 101, 0.14);
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 2px 16px rgba(0, 0, 0, 0.35);
+}
+
+/* semantic tints */
+:root {
+  --t-teal: #096d87;
+  --t-violet: #5346d4;
+  --t-amber: #8a5606;
+  --t-green: #08704e;
+  --t-rose: #b81f33;
+  --t-indigo: #0c3064;
+}
+:root[data-theme='dark'],
+:root:not([data-theme='light']) {
+  --t-teal: #2bb8da;
+  --t-violet: #9b91ff;
+  --t-amber: #f59e0b;
+  --t-green: #3fbd82;
+  --t-rose: #ff6b7e;
+  --t-indigo: #93b4e8;
+}
+.t-teal { --tint: var(--t-teal); }
+.t-violet { --tint: var(--t-violet); }
+.t-amber { --tint: var(--t-amber); }
+.t-green { --tint: var(--t-green); }
+.t-rose { --tint: var(--t-rose); }
+.t-indigo { --tint: var(--t-indigo); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
