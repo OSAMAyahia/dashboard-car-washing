@@ -19,7 +19,7 @@ type Seg = keyof typeof SEG;
 interface CustomerRow {
   id: string;
   name: string | null;
-  phone: string;
+  phone: string | null;
   visits: number;
   lastVisitAt: string | null;
   totalSpend: number;
@@ -78,8 +78,8 @@ export default function CustomersPage() {
             <Row key={c.id} className="cursor-pointer">
               <Cell>
                 <Link to={`/customers/${c.id}`} className="flex items-center gap-2.5">
-                  <span className={`grid h-[30px] w-[30px] flex-none place-items-center rounded-full text-[11.5px] font-extrabold ${tintOf(c.name ?? c.phone)}`} style={{ background: 'color-mix(in srgb, var(--tint) 15%, transparent)', color: 'var(--tint)' }}>{initials(c.name ?? c.phone)}</span>
-                  <div><b>{c.name ?? 'بدون اسم'}</b><div className="text-[11px] text-ink-faint" dir="ltr">{c.phone}</div></div>
+                  <span className={`grid h-[30px] w-[30px] flex-none place-items-center rounded-full text-[11.5px] font-extrabold ${tintOf(c.name ?? c.phone ?? c.id)}`} style={{ background: 'color-mix(in srgb, var(--tint) 15%, transparent)', color: 'var(--tint)' }}>{initials(c.name ?? c.phone ?? '?')}</span>
+                  <div><b>{c.name ?? 'بدون اسم'}</b><div className="text-[11px] text-ink-faint" dir="ltr">{c.phone ?? '—'}</div></div>
                 </Link>
               </Cell>
               <Cell className="tabular-nums">{c.visits}</Cell>

@@ -5,10 +5,17 @@ import { useAuth } from '@/lib/auth';
 import { P } from '@/lib/icons';
 import { ThemeToggle } from './theme-toggle';
 
+/** Staff roles allowed to see a nav item — matches the backend's @Roles guards
+ *  on that page's endpoints (catalog/branches/staff/coupons/reports are
+ *  OWNER+MANAGER only). Omitted `roles` = every role can see it. */
+type StaffRole = 'OWNER' | 'MANAGER' | 'RECEPTIONIST' | 'WASHER';
+const MANAGEMENT: StaffRole[] = ['OWNER', 'MANAGER'];
+
 interface NavItem {
   to: string;
   label: string;
   icon: string;
+  roles?: StaffRole[];
 }
 interface NavGroup {
   title: string;
@@ -27,19 +34,19 @@ const STAFF_NAV: NavGroup[] = [
   {
     title: 'الإعداد',
     items: [
-      { to: '/catalog', label: 'الخدمات والأسعار', icon: P.tag },
-      { to: '/branches', label: 'الفروع', icon: P.building },
-      { to: '/staff', label: 'الموظفون', icon: P.users },
+      { to: '/catalog', label: 'الخدمات والأسعار', icon: P.tag, roles: MANAGEMENT },
+      { to: '/branches', label: 'الفروع', icon: P.building, roles: MANAGEMENT },
+      { to: '/staff', label: 'الموظفون', icon: P.users, roles: MANAGEMENT },
     ],
   },
   {
     title: 'النمو',
     items: [
       { to: '/customers', label: 'العملاء (CRM)', icon: P.contact },
-      { to: '/coupons', label: 'الكوبونات', icon: P.tag },
+      { to: '/coupons', label: 'الكوبونات', icon: P.tag, roles: MANAGEMENT },
     ],
   },
-  { title: 'التحليلات', items: [{ to: '/reports', label: 'التقارير', icon: P.trend }] },
+  { title: 'التحليلات', items: [{ to: '/reports', label: 'التقارير', icon: P.trend, roles: MANAGEMENT }] },
 ];
 
 const PLATFORM_NAV: NavGroup[] = [
@@ -78,7 +85,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
   useEffect(() => setOpen(false), [pathname]);
 
   const isPlatform = user?.type === 'platform';
-  const nav = isPlatform ? PLATFORM_NAV : STAFF_NAV;
+  const role = user?.role as StaffRole | null;
+  const staffNav = STAFF_NAV
+    .map((g) => ({ ...g, items: g.items.filter((it) => !it.roles || (role && it.roles.includes(role))) }))
+    .filter((g) => g.items.length > 0);
+  const nav = isPlatform ? PLATFORM_NAV : staffNav;
   const subtitle = isPlatform ? 'لوحة تحكم المنصة' : 'لوحة تشغيل المغسلة';
   const today = new Date().toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 

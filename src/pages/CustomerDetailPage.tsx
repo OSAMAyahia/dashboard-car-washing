@@ -10,7 +10,7 @@ import { Badge, Card, CardBody, CardHeader, Cell, DataTable, Kpi, Row, Spinner }
 interface Detail {
   id: string;
   name: string | null;
-  phone: string;
+  phone: string | null;
   vehicles: { id: string; plate: string; label: string | null; size: { id: string; code: string; name: string } }[];
   stats: { visits: number; totalSpend: number; avgOrderValue: number; segment: string; lastVisitAt: string | null };
   recentBookings: { id: string; scheduledAt: string; status: string; total: number; service: { name: string }; branch: { name: string } }[];
@@ -25,7 +25,7 @@ export default function CustomerDetail() {
 
   return (
     <div className="flex flex-col gap-4">
-      <PageHead eyebrow="العملاء" title={data.name ?? 'عميل'} subtitle={data.phone} />
+      <PageHead eyebrow="العملاء" title={data.name ?? 'عميل'} subtitle={data.phone ?? '—'} />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Kpi label="عدد الزيارات" value={data.stats.visits} icon={<Icon d={P.calendar} size={15} />} />

@@ -14,25 +14,52 @@ export class ApiError extends Error {
   }
 }
 
-// in-memory access token (refresh lives in an httpOnly cookie)
+// in-memory access token (refresh lives in an httpOnly cookie when the browser
+// keeps it — Safari ITP / Chrome third-party-cookie blocking drop it for our
+// cross-site vercel.app <-> railway.app setup, so we also keep a client-side
+// fallback copy of the refresh token in localStorage)
 let accessToken: string | null = null;
 export const setAccessToken = (t: string | null) => {
   accessToken = t;
 };
 export const getAccessToken = () => accessToken;
 
+const RT_KEY = 'cw_dash_rt';
+function loadRefreshToken(): string | null {
+  try {
+    return window.localStorage.getItem(RT_KEY);
+  } catch {
+    return null;
+  }
+}
+export function storeRefreshToken(token: string | null) {
+  try {
+    if (token) window.localStorage.setItem(RT_KEY, token);
+    else window.localStorage.removeItem(RT_KEY);
+  } catch {
+    /* private mode / storage disabled — session just won't survive a reload */
+  }
+}
+export const getStoredRefreshToken = loadRefreshToken;
+
 let refreshing: Promise<boolean> | null = null;
 async function tryRefresh(): Promise<boolean> {
   refreshing ??= (async () => {
     try {
+      const stored = loadRefreshToken();
       const res = await fetch(`${BASE}/auth/refresh`, {
         method: 'POST',
         credentials: 'include',
-        headers: { 'x-tenant-slug': TENANT },
+        headers: { 'x-tenant-slug': TENANT, 'content-type': 'application/json' },
+        body: JSON.stringify(stored ? { refreshToken: stored } : {}),
       });
-      if (!res.ok) return false;
+      if (!res.ok) {
+        storeRefreshToken(null);
+        return false;
+      }
       const body = await res.json();
       accessToken = body.accessToken ?? null;
+      if (body.refreshToken) storeRefreshToken(body.refreshToken);
       return !!accessToken;
     } catch {
       return false;

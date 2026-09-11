@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { api, ApiError, setAccessToken } from './api';
+import { api, ApiError, setAccessToken, getStoredRefreshToken, storeRefreshToken } from './api';
 
 export interface AuthUser {
   id: string;
@@ -21,8 +21,9 @@ interface AuthState {
 
 const Ctx = createContext<AuthState | null>(null);
 
-function applySession(body: { accessToken: string; user: AuthUser }) {
+function applySession(body: { accessToken: string; refreshToken?: string; user: AuthUser }) {
   setAccessToken(body.accessToken);
+  if (body.refreshToken) storeRefreshToken(body.refreshToken);
   return body.user;
 }
 
@@ -30,12 +31,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // restore session from the refresh cookie on mount — falls back to a
+  // locally-stored refresh token when the browser dropped the cross-site cookie
   useEffect(() => {
     (async () => {
       try {
-        const body = await api.post<{ accessToken: string; user: AuthUser }>(
+        const stored = getStoredRefreshToken();
+        const body = await api.post<{ accessToken: string; refreshToken?: string; user: AuthUser }>(
           '/auth/refresh',
-          undefined,
+          stored ? { refreshToken: stored } : undefined,
           { auth: false },
         );
         setUser(applySession(body));
@@ -49,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loginPassword = useCallback(
     async (kind: 'staff' | 'platform', email: string, password: string) => {
-      const body = await api.post<{ accessToken: string; user: AuthUser }>(
+      const body = await api.post<{ accessToken: string; refreshToken?: string; user: AuthUser }>(
         `/auth/${kind}/login`,
         { email, password },
         { auth: false },
@@ -76,7 +80,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const logout = useCallback(async () => {
-    await api.post('/auth/logout', undefined, { auth: false }).catch(() => {});
+    const stored = getStoredRefreshToken();
+    await api.post('/auth/logout', stored ? { refreshToken: stored } : undefined, { auth: false }).catch(() => {});
+    storeRefreshToken(null);
     setAccessToken(null);
     setUser(null);
   }, []);
