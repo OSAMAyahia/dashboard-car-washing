@@ -1,3 +1,4 @@
+import { CustomerSiteLink } from '@/components/customer-site-link';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
@@ -53,6 +54,8 @@ export default function TenantDetail() {
         subtitle={`${data.slug} · مشترك منذ ${shortDate(data.createdAt)}`}
         actions={<Badge tone={data.status === 'ACTIVE' ? 'good' : data.status === 'TRIAL' ? 'warn' : 'crit'} dot>{data.status}</Badge>}
       />
+
+      <CustomerSiteLink slug={data.slug} />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Kpi label="الفروع" value={data._count.branches} icon={<Icon d={P.building} size={15} />} />

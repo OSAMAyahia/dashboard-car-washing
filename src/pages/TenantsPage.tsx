@@ -1,3 +1,4 @@
+import { CustomerSiteLink } from '@/components/customer-site-link';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
@@ -39,10 +40,10 @@ export default function TenantsPage() {
   const create = useMutation({
     mutationFn: () =>
       api.post('/platform/tenants', {
-        name: form.name,
-        slug: form.slug,
+        name: form.name.trim(),
+        slug: form.slug.trim().toLowerCase(),
         planKey: form.planKey,
-        owner: { name: form.ownerName, email: form.ownerEmail, password: form.ownerPassword },
+        owner: { name: form.ownerName.trim(), email: form.ownerEmail.trim().toLowerCase(), password: form.ownerPassword },
       }),
     onSuccess: () => { setShowForm(false); setForm({ name: '', slug: '', planKey: 'STARTER', ownerName: '', ownerEmail: '', ownerPassword: '' }); toast('أُنشئت المغسلة'); invalidate(); },
     onError: (e) => toast(e instanceof ApiError ? e.message : 'خطأ', 'error'),
@@ -75,15 +76,17 @@ export default function TenantsPage() {
         <Card>
           <CardHeader icon={<Icon d={P.plus} />} title="مغسلة جديدة" meta="تُنشأ باشتراك تجريبي 14 يوم" />
           <CardBody>
+            <form onSubmit={(event) => { event.preventDefault(); create.mutate(); }}>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              <Field label="اسم المغسلة"><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></Field>
-              <Field label="المعرّف (slug)"><Input dir="ltr" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="demo" /></Field>
+              <Field label="اسم المغسلة"><Input required minLength={2} maxLength={80} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></Field>
+              <Field label="اسم المغسلة في الرابط" hint="حروف إنجليزية وأرقام وشرطة، مثل osama"><Input required maxLength={40} pattern="[a-zA-Z0-9]([a-zA-Z0-9\-]{0,38}[a-zA-Z0-9])?" dir="ltr" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="demo" /></Field>
               <Field label="الباقة"><Select value={form.planKey} onChange={(e) => setForm({ ...form, planKey: e.target.value as PlanKey })}><option value="STARTER">Starter</option><option value="BUSINESS">Business</option><option value="PRO">Pro</option><option value="WHITE_LABEL">White Label</option></Select></Field>
-              <Field label="اسم المالك"><Input value={form.ownerName} onChange={(e) => setForm({ ...form, ownerName: e.target.value })} /></Field>
-              <Field label="بريد المالك"><Input type="email" dir="ltr" value={form.ownerEmail} onChange={(e) => setForm({ ...form, ownerEmail: e.target.value })} /></Field>
-              <Field label="كلمة مرور مبدئية"><Input type="text" dir="ltr" value={form.ownerPassword} onChange={(e) => setForm({ ...form, ownerPassword: e.target.value })} /></Field>
+              <Field label="اسم المالك"><Input required minLength={2} maxLength={60} value={form.ownerName} onChange={(e) => setForm({ ...form, ownerName: e.target.value })} /></Field>
+              <Field label="بريد المالك"><Input required type="email" dir="ltr" value={form.ownerEmail} onChange={(e) => setForm({ ...form, ownerEmail: e.target.value })} /></Field>
+              <Field label="كلمة مرور مبدئية" hint="من 8 إلى 128 حرفًا"><Input required minLength={8} maxLength={128} autoComplete="new-password" type="password" dir="ltr" value={form.ownerPassword} onChange={(e) => setForm({ ...form, ownerPassword: e.target.value })} /></Field>
             </div>
-            <Button className="mt-3" disabled={create.isPending || !form.name || !form.slug || form.ownerPassword.length < 8} onClick={() => create.mutate()}>إنشاء</Button>
+            <Button type="submit" className="mt-3" disabled={create.isPending}>إنشاء</Button>
+            </form>
           </CardBody>
         </Card>
       )}
@@ -99,6 +102,7 @@ export default function TenantsPage() {
                   <span className={`grid h-[30px] w-[30px] flex-none place-items-center rounded-full text-[11.5px] font-extrabold ${tintOf(t.name)}`} style={{ background: 'color-mix(in srgb, var(--tint) 15%, transparent)', color: 'var(--tint)' }}>{initials(t.name)}</span>
                   <div><b>{t.name}</b><div className="text-[11px] text-ink-faint" dir="ltr">{t.slug}</div></div>
                 </Link>
+                <CustomerSiteLink slug={t.slug} />
               </Cell>
               <Cell><Badge>{t.subscription?.planKey ?? '—'}</Badge></Cell>
               <Cell className="tabular-nums">{t._count.branches}</Cell>
