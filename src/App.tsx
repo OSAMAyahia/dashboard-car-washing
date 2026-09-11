@@ -21,6 +21,7 @@ import TenantDetailPage from '@/pages/TenantDetailPage';
 import PlansPage from '@/pages/PlansPage';
 import BillingPage from '@/pages/BillingPage';
 import SupportPage from '@/pages/SupportPage';
+import ComplaintsPage from '@/pages/ComplaintsPage';
 
 function Gate() {
   const { user, loading } = useAuth();
@@ -69,6 +70,7 @@ function Gate() {
             <Route path="/staff" element={<StaffPage />} />
             <Route path="/customers" element={<CustomersPage />} />
             <Route path="/customers/:id" element={<CustomerDetailPage />} />
+            <Route path="/complaints" element={<ComplaintsPage />} />
             <Route path="/reports" element={<ReportsPage />} />
           </>
         )}

@@ -43,6 +43,7 @@ const STAFF_NAV: NavGroup[] = [
     title: 'النمو',
     items: [
       { to: '/customers', label: 'العملاء (CRM)', icon: P.contact },
+      { to: '/complaints', label: 'الشكاوى', icon: P.alert },
       { to: '/coupons', label: 'الكوبونات', icon: P.tag, roles: MANAGEMENT },
     ],
   },
