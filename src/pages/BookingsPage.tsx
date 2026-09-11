@@ -23,10 +23,10 @@ interface Booking {
   status: Status;
   total: number;
   source: 'ONLINE' | 'WALK_IN';
-  customer: { name: string | null; phone: string };
-  vehicle: { plate: string };
-  service: { name: string };
-  branch: { name: string };
+  customer?: { name: string | null; phone: string };
+  vehicle?: { plate: string };
+  service?: { name: string };
+  branch?: { name: string };
   workOrder: { id: string } | null;
 }
 
@@ -92,10 +92,10 @@ export default function BookingsPage() {
           {(q.data?.rows ?? []).map((b) => (
             <Row key={b.id}>
               <Cell className="tabular-nums">{time(b.scheduledAt)}</Cell>
-              <Cell className="font-semibold">{b.customer.name ?? b.customer.phone}</Cell>
-              <Cell className="font-mono">{b.vehicle.plate}</Cell>
-              <Cell>{b.service.name}</Cell>
-              <Cell className="text-ink-soft">{b.branch.name}</Cell>
+              <Cell className="font-semibold">{b.customer?.name ?? b.customer?.phone ?? '—'}</Cell>
+              <Cell className="font-mono">{b.vehicle?.plate ?? '—'}</Cell>
+              <Cell>{b.service?.name ?? '—'}</Cell>
+              <Cell className="text-ink-soft">{b.branch?.name ?? '—'}</Cell>
               <Cell className="tabular-nums">{money(b.total)}</Cell>
               <Cell><Badge tone={TONE[b.status]}>{LABEL[b.status]}</Badge></Cell>
               <Cell>
